@@ -7,6 +7,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 
@@ -15,12 +16,16 @@ public class NewOrderMain {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
 
         var producer = new KafkaProducer<String, String>(properties());
-        var value = "1,888,10.50";
-        var record = new ProducerRecord<String, String>("ECOMMERCE_NEW_ORDER",value,value);
-        var email = "bem vindo! nos estamos processando seu pedido";
-        var emailRecord = new ProducerRecord<String, String>("ECOMMERCE_SEND_EMAIL", email,email);
-        producer.send(record, getCallback()).get();
-        producer.send(emailRecord, getCallback()).get();
+
+        //for(int i=0; i<100; i++) {
+            var key = UUID.randomUUID().toString();
+            var value = key + ",888,10.50";
+            var record = new ProducerRecord<String, String>("ECOMMERCE_NEW_ORDER", key, value);
+            var email = "bem vindo! nos estamos processando seu pedido";
+            var emailRecord = new ProducerRecord<String, String>("ECOMMERCE_SEND_EMAIL", key, email);
+            producer.send(record, getCallback()).get();
+            producer.send(emailRecord, getCallback()).get();
+        //}
     }
 
     private static Callback getCallback() {
