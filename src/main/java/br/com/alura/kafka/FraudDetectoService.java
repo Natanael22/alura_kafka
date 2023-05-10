@@ -1,54 +1,32 @@
 package br.com.alura.kafka;
 
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import java.time.Duration;
-import java.util.Collections;
-import java.util.Properties;
-import java.util.UUID;
 
 public class FraudDetectoService {
 
-    public static void main(String[] args){
-       var consumer = new KafkaConsumer<String,String>(properties());
-       consumer.subscribe(Collections.singletonList("ECOMMERCE_NEW_ORDER"));
+    public static void main(String[] args) {
 
-       while(true) {
-           var records = consumer.poll(Duration.ofMillis(100));
-           if (!records.isEmpty()) {
-               System.out.println("encontrei "+records.count()+" registros");
-               //return;
-
-           for (var record : records) {
-               System.out.println("___________________________________");
-               System.out.println("processing new order, checking for fraud");
-               System.out.println("key " + record.key());
-               System.out.println("value " + record.value());
-               System.out.println("partition " + record.partition());
-               System.out.println("offset " + record.offset());
-               try {
-                   Thread.sleep(5000);
-               } catch (InterruptedException e) {
-                   //ignoring
-                   e.printStackTrace();
-               }
-               System.out.println("order processed");
-           }
-           }
-       }
+        var fraudService = new FraudDetectoService();
+        var service = new KafkaService(FraudDetectoService.class.getSimpleName(),"ECOMMERCE_NEW_ORDER", fraudService::parse);
+        service.run();
     }
 
-    private static Properties properties() {
-        var properties = new Properties();
-        properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"127.0.0.1:9092");
-        properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, FraudDetectoService.class.getSimpleName());
-        properties.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, FraudDetectoService.class.getSimpleName()+"_"+ UUID.randomUUID().toString());
-        properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG,"1");
-        return properties;
+    private void parse(ConsumerRecord<String, String> record) {
+
+        System.out.println("___________________________________");
+        System.out.println("processing new order, checking for fraud");
+        System.out.println("key " + record.key());
+        System.out.println("value " + record.value());
+        System.out.println("partition " + record.partition());
+        System.out.println("offset " + record.offset());
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            //ignoring
+            e.printStackTrace();
+        }
+        System.out.println("order processed");
     }
+
 }

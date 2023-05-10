@@ -17,7 +17,7 @@ public class NewOrderMain {
 
         var producer = new KafkaProducer<String, String>(properties());
 
-        //for(int i=0; i<100; i++) {
+        for(int i=0; i<10; i++) {
             var key = UUID.randomUUID().toString();
             var value = key + ",888,10.50";
             var record = new ProducerRecord<String, String>("ECOMMERCE_NEW_ORDER", key, value);
@@ -25,7 +25,7 @@ public class NewOrderMain {
             var emailRecord = new ProducerRecord<String, String>("ECOMMERCE_SEND_EMAIL", key, email);
             producer.send(record, getCallback()).get();
             producer.send(emailRecord, getCallback()).get();
-        //}
+        }
     }
 
     private static Callback getCallback() {
