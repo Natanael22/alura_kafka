@@ -2,18 +2,21 @@ package br.com.alura.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
+import java.util.Map;
+
 
 public class FraudDetectoService {
 
     public static void main(String[] args) {
 
         var fraudService = new FraudDetectoService();
-        try(var service = new KafkaService(FraudDetectoService.class.getSimpleName(),"ECOMMERCE_NEW_ORDER", fraudService::parse)) {
+        try(var service = new KafkaService<>(FraudDetectoService.class.getSimpleName(),
+                "ECOMMERCE_NEW_ORDER", fraudService::parse,Order.class, Map.of())) {
                 service.run();
         }
     }
 
-    private void parse(ConsumerRecord<String, String> record) {
+    private void parse(ConsumerRecord<String, Order> record) {
 
         System.out.println("___________________________________");
         System.out.println("processing new order, checking for fraud");
